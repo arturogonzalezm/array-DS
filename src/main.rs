@@ -8,32 +8,23 @@ use std::io::{self, BufRead};
  */
 
 fn reverse_array(a: &[i32]) -> Vec<i32> {
-    let mut reversed = a.to_vec();
-    reversed.reverse();
-    reversed
+    // Instead of converting to a vector and then reversing, directly collect into a reversed iterator.
+    a.iter().rev().copied().collect()
 }
 
 fn main() {
     let stdin = io::stdin();
     let mut stdin_iterator = stdin.lock().lines();
 
-    let _arr_count = stdin_iterator.next().unwrap().unwrap().trim().parse::<i32>().unwrap();
+    let _arr_count = stdin_iterator.next().unwrap().unwrap().trim().parse::<usize>().unwrap();
 
     let arr: Vec<i32> = stdin_iterator.next().unwrap().unwrap()
-        .trim_end()
-        .split(' ')
-        .map(|s| s.to_string().parse::<i32>().unwrap())
+        .split_whitespace()
+        .map(|s| s.parse().unwrap())
         .collect();
 
     let res = reverse_array(&arr);
 
-    for i in 0..res.len() {
-        print!("{}", res[i]);
-
-        if i != res.len() - 1 {
-            print!(" ");
-        }
-    }
-
-    println!();
+    // Join the elements with a space and print them in one go to avoid multiple prints
+    println!("{}", res.iter().map(|x| x.to_string()).collect::<Vec<String>>().join(" "));
 }
