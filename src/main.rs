@@ -1,30 +1,31 @@
 use std::io::{self, BufRead};
-
-/*
- * Complete the 'reverse_array' function below.
- *
- * The function is expected to return an INTEGER_ARRAY.
- * The function accepts INTEGER_ARRAY a as parameter.
- */
+use std::num::ParseIntError;
 
 fn reverse_array(a: &[i32]) -> Vec<i32> {
-    // Instead of converting to a vector and then reversing, directly collect into a reversed iterator.
     a.iter().rev().copied().collect()
 }
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let stdin = io::stdin();
     let mut stdin_iterator = stdin.lock().lines();
 
-    let _arr_count = stdin_iterator.next().unwrap().unwrap().trim().parse::<usize>().unwrap();
+    let arr_count = stdin_iterator.next().ok_or("No input for array count")??
+        .trim().parse::<usize>()?;
 
-    let arr: Vec<i32> = stdin_iterator.next().unwrap().unwrap()
+    let arr: Result<Vec<i32>, ParseIntError> = stdin_iterator.next().ok_or("No input for array elements")??
         .split_whitespace()
-        .map(|s| s.parse().unwrap())
+        .map(|s| s.parse())
         .collect();
+
+    let arr = arr?;
+
+    if arr.len() != arr_count {
+        return Err("Array length does not match the specified count".into());
+    }
 
     let res = reverse_array(&arr);
 
-    // Join the elements with a space and print them in one go to avoid multiple prints
     println!("{}", res.iter().map(|x| x.to_string()).collect::<Vec<String>>().join(" "));
+
+    Ok(())
 }
